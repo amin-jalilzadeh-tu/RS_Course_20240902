@@ -1,0 +1,111 @@
+// Define the area of interest (replace with your specific coordinates)
+var aoi = ee.Geometry.Rectangle([100.0, 1.0, 101.0, 2.0]);
+
+// Load the Hansen Global Forest Change dataset
+var gfc = ee.Image('UMD/hansen/global_forest_change_2019_v1_7');
+
+// Extract the forest cover for the year 2000
+var forestCover2000 = gfc.select(['treecover2000']);
+
+// Extract the forest loss year band
+var lossYear = gfc.select(['lossyear']);
+
+// Create a mask for changes between 2013 and 2019 (lossYear 13-19 correspond to years 2013-2019)
+var changeMask = lossYear.gte(13).and(lossYear.lte(19));
+
+// Apply the mask to the loss year band
+var changes = lossYear.updateMask(changeMask);
+
+// Remap the years to make them more intuitive (2013 = 1, 2014 = 2, etc.)
+var changesRemapped = changes.remap(
+  [13, 14, 15, 16, 17, 18, 19],
+  [2013, 2014, 2015, 2016, 2017, 2018, 2019],
+  0
+).rename('year');
+
+// Define a color palette for the years
+var palette = ['ff0000', 'ff3300', 'ff6600', 'ff9900', 'ffcc00', 'ffff00', 'ccff00'];
+
+// Create a visualization parameter object
+var visParams = {
+  min: 2013,
+  max: 2019,
+  palette: palette
+};
+
+// Add the layers to the map
+Map.centerObject(aoi, 8);
+Map.addLayer(forestCover2000.clip(aoi), {palette: ['000000', '00FF00'], max: 100}, 'Forest Cover 2000');
+Map.addLayer(changesRemapped.clip(aoi), visParams, 'Forest Loss Year');
+
+// Calculate the total area of change
+var areaImage = changesRemapped.gt(0).multiply(ee.Image.pixelArea());
+var totalChange = areaImage.reduceRegion({
+  reducer: ee.Reducer.sum(),
+  geometry: aoi,
+  scale: 30,
+  maxPixels: 1e9
+});
+
+print('Total area of change (sq m):', totalChange.get('year'));
+
+// Calculate change per year
+var years = ee.List.sequence(2013, 2019);
+var yearlyChange = years.map(function(year) {
+  var yearArea = changesRemapped.eq(ee.Number(year)).multiply(ee.Image.pixelArea());
+  var area = yearArea.reduceRegion({
+    reducer: ee.Reducer.sum(),
+    geometry: aoi,
+    scale: 30,
+    maxPixels: 1e9
+  });
+  return ee.Feature(null, {
+    'year': year,
+    'area': area.get('year')
+  });
+});
+
+print('Yearly change:', ee.FeatureCollection(yearlyChange));
+
+// Add a legend
+var legend = ui.Panel({
+  style: {
+    position: 'bottom-left',
+    padding: '8px 15px'
+  }
+});
+
+var legendTitle = ui.Label({
+  value: 'Forest Loss Year',
+  style: {
+    fontWeight: 'bold',
+    fontSize: '18px',
+    margin: '0 0 4px 0',
+    padding: '0'
+  }
+});
+legend.add(legendTitle);
+
+var makeRow = function(color, name) {
+  var colorBox = ui.Label({
+    style: {
+      backgroundColor: '#' + color,
+      padding: '8px',
+      margin: '0 0 4px 0'
+    }
+  });
+  var description = ui.Label({
+    value: name,
+    style: {margin: '0 0 4px 6px'}
+  });
+  return ui.Panel({
+    widgets: [colorBox, description],
+    layout: ui.Panel.Layout.Flow('horizontal')
+  });
+};
+
+for (var i = 0; i < palette.length; i++) {
+  legend.add(makeRow(palette[i], (2013 + i).toString()));
+}
+
+Map.add(legend);
