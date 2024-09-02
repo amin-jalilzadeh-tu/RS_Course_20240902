@@ -1,7 +1,6 @@
 # RS_Course_20240902
 
 
-# Welcome to the GitHub Repository
 
 This repository provides resources and code examples. Below are the steps and links you'll need to begin.
 
