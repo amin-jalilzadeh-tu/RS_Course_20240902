@@ -18,7 +18,11 @@ Explore different datasets available on Earth Engine by visiting the [Data Catal
 ### Step 3: Learn About Functions
 
 For more detailed information on specific functions, check the following resources:
+
 - [Earth Engine API - Terrain Slope](https://developers.google.com/earth-engine/apidocs/ee-terrain-slope)
+
+example codes developed by Qiusheng Wu!
+
 - [Leafmap Overview - Extrude Polygons](https://leafmap.org/maplibre/overview/#extrude-polygons-for-3d-indoor-mapping)
 - [Geemap Notebooks](https://geemap.org/)
 
