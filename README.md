@@ -3,7 +3,7 @@
 
 # Welcome to the GitHub Repository
 
-This repository provides resources and code examples to help you learn and work with Google Earth Engine and other associated tools. Below are the steps and links you'll need to begin.
+This repository provides resources and code examples. Below are the steps and links you'll need to begin.
 
 ## Setting Up
 
