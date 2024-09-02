@@ -50,7 +50,7 @@ Log in to your Google Drive, click '+ New', and from 'More', search for 'Colab'.
 
 For authentication and initialization, use the following code in your Colab notebook:
 
-``python
+```python
 import geemap
 import ee
 from google.colab import auth
@@ -58,7 +58,7 @@ from google.colab import auth
 # Authenticate and initialize the Earth Engine session
 auth.authenticate_user()
 ee.Initialize(project='the id of the project you created')
-''
+```
 
 **Sample Code:** Access a sample notebook [here](https://colab.research.google.com/drive/1VhstK4uZqQsMttKoKRmHeWcuaZN77sOj?usp=sharing) or use the file `Azar_RS_20240902.ipynb`.
 
@@ -68,10 +68,10 @@ ee.Initialize(project='the id of the project you created')
 
 To use Google Earth Engine in non-Colab environments or with QGIS, execute the following commands in your command line (for Windows):
 
-``shell
+```shell
 pip install earthengine-api
 earthengine authenticate
-
+```
 This will store your credentials for future use.
 
 ### Step 10: Running Code in QGIS
